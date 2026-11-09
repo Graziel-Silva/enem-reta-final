@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Finalizar compra | Reta final ENEM 2026</title>
+<meta name="robots" content="noindex">
+<style>
+  :root { --primary: #0b5cff; --accent: #ffb703; --text: #1d2433; --muted: #5b6475; --soft: #f3f6fd; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color: var(--text); background: var(--soft); line-height: 1.5; padding: 24px 16px; min-height: 100vh; }
+  .wrap { max-width: 480px; margin: 0 auto; }
+  h1 { font-size: 24px; margin-bottom: 6px; }
+  .sub { color: var(--muted); font-size: 15px; margin-bottom: 20px; }
+  .card { background: #fff; border-radius: 14px; padding: 22px; margin-bottom: 16px; box-shadow: 0 4px 16px rgba(11,92,255,.08); }
+  .card h2 { font-size: 16px; margin-bottom: 12px; }
+  .row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 15px; }
+  .total { border-top: 1px solid #e4e8f2; margin-top: 8px; padding-top: 12px; font-weight: 700; font-size: 18px; }
+  label { display: block; font-size: 14px; font-weight: 600; margin: 12px 0 6px; }
+  input { width: 100%; padding: 13px; border: 1px solid #d5dbe8; border-radius: 10px; font-size: 16px; font-family: inherit; }
+  .btn { width: 100%; margin-top: 18px; background: var(--accent); color: var(--text); border: none; border-radius: 10px; padding: 16px; font-size: 17px; font-weight: 700; cursor: pointer; }
+  .btn:disabled { opacity: .6; cursor: not-allowed; }
+  .msg { display: none; margin-top: 14px; padding: 12px; border-radius: 10px; font-size: 14px; background: #fff4d6; color: #7a5600; }
+  .secure { text-align: center; font-size: 13px; color: var(--muted); margin-top: 14px; }
+  .error { color: #b42318; font-size: 13px; margin-top: 6px; display: none; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Finalizar compra</h1>
+  <p class="sub">Você está quase com acesso à reta final.</p>
+
+  <div class="card">
+    <h2>Resumo do pedido</h2>
+    <div class="row"><span>Reta final ENEM 2026</span><span>R$ 20,90</span></div>
+    <div class="row total"><span>Total</span><span>R$ 20,90</span></div>
+    <p class="sub" style="margin:10px 0 0;font-size:13px">Oferta válida até sábado, 14/11, às 23h59 (horário de Brasília).</p>
+  </div>
+
+  <form class="card" id="checkout" novalidate>
+    <h2>Seus dados</h2>
+    <label for="nome">Nome completo</label>
+    <input id="nome" name="nome" type="text" autocomplete="name" required>
+    <label for="email">E-mail (onde você recebe o acesso)</label>
+    <input id="email" name="email" type="email" autocomplete="email" required>
+    <div class="error" id="err">Preencha nome e um e-mail válido.</div>
+
+    <button class="btn" id="pagar" type="submit">Pagar R$ 20,90</button>
+    <div class="msg" id="msg">O pagamento ainda não está ativo. Assim que o meio de pagamento for conectado, esta página liberará a compra.</div>
+  </form>
+
+  <p class="secure">Ambiente seguro. Você receberá o acesso por e-mail após a confirmação do pagamento.</p>
+</div>
+
+<script>
+  // Configuração: preencher quando o provedor de pagamento estiver conectado.
+  var PAYMENT_ENABLED = false;
+
+  var form = document.getElementById("checkout");
+  var err = document.getElementById("err");
+  var msg = document.getElementById("msg");
+
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    var nome = document.getElementById("nome").value.trim();
+    var email = document.getElementById("email").value.trim();
+    var emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    if (!nome || !emailOk) {
+      err.style.display = "block";
+      return;
+    }
+    err.style.display = "none";
+    fetch("https://penlsiwkieruvcvnkdjr.supabase.co/rest/v1/orders", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "apikey": "sb_publishable_B114CiEO_7f1dCpxE55H7A_9zfpM3Fy", "Authorization": "Bearer sb_publishable_B114CiEO_7f1dCpxE55H7A_9zfpM3Fy", "Prefer": "return=minimal" },
+      body: JSON.stringify({ nome: nome, email: email, valor: 20.90, status: "pendente" })
+    }).catch(function () {});
+    if (!PAYMENT_ENABLED) {
+      msg.style.display = "block";
+      return;
+    }
+    // Ponto de integração: criar a cobrança no provedor escolhido e redirecionar.
+  });
+</script>
+</body>
+</html>
